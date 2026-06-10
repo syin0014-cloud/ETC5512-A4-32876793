@@ -1,0 +1,278 @@
+---
+title: "What is your blogpost title? Add it here??"
+subtitle: "Assignment 4 ETC5512"
+author: "Who are you?? Add your name here"
+format: html
+editor: visual
+---
+
+::: panel-tabset
+<!-- Task 1 Tab: Data and Documenting -->
+
+## Data and Documenting
+
+### Topic of this work
+
+This blog post looks at recent global food price pressure. My main question is:
+
+**Which food categories drove global food price increases after 2020, and how did food inflation differ across countries?**
+
+I chose this question because food prices are something people notice in everyday life. To explore the topic from different perspectives, I use the FAO Food Price Index to examine global food category trends and World Bank country-level food inflation data to compare patterns across countries.
+
+### Data description
+
+I used three datasets for this analysis. The first dataset is used to compare global food categories. The second dataset is used to compare countries. The third dataset is used only for the map, so that the country-level results can be shown using boundary data.
+
+For more details on the cleaned datasets and variables used in the analysis, I will include a `README.md` file and a `data_dictionary.csv` file.
+
+#### Dataset 1: FAO Food Price Index
+
+-   **Source:** Food and Agriculture Organization of the United Nations
+
+-   **Link:** <https://www.fao.org/worldfoodsituation/foodpricesindex/en/>
+
+-   **Content:** Monthly global food price index values. The dataset includes the overall Food Price Index and separate indices for Meat, Dairy, Cereals, Oils and Sugar.
+
+-   **Time period used:** 2020 to the latest available month in the downloaded file.
+
+-   **Data type:** Observational time-series data.
+
+-   **Use in this project:** This dataset is used to compare which food categories increased the most after 2020.
+
+-   **Why it is suitable:** It directly matches the first part of my research question because it gives monthly food price index values by food category. It is also from FAO, which is a reliable international organisation.
+
+-   **Limitations:** This is a global index, so it does not show exact grocery prices paid by households in different countries. It also does not explain the causes of price changes.
+
+-   **Privacy/Ethics:** The data is public and aggregated. It does not contain personal information, so there are no major privacy concerns.
+
+#### Dataset 2: World Bank Monthly Food Price Inflation Estimates by Country
+
+\- Source: The World Bank\
+\
+- Link: <https://microdata.worldbank.org/catalog/4509/get-microdata>\
+\
+- Content: Modelled monthly food price estimates by product and market. \
+\
+- Time period used: 2020 onwards, to match the FAO analysis period.\
+\
+- Data type: Observational country-level and market-level time-series data.\
+\
+- Use in this project: This dataset is used to add country-level comparison to the analysis. While the FAO dataset shows global food category trends, the World Bank dataset provides more detailed food price estimates across countries, products and markets.\
+\
+- Why it is suitable: This dataset helps expand the project beyond a single global index. It allows me to compare food price patterns across countries and see whether food price pressure appears differently in different places.\
+\
+- Limitations: The data is based on modelled monthly food price estimates, so it may not represent the exact prices paid by every household. It is also more detailed than the FAO data and may require extra cleaning because it includes country, product and market information.\
+\
+- Privacy/Ethics: The data is public and does not contain personal information. Since it is country, product and market level data, there are no major privacy concerns.
+
+#### Dataset 3: Natural Earth Country Boundaries
+
+-   **Source:** Natural Earth
+
+-   **Link:** <https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/>
+
+-   **Content:** Country boundary shapes and country codes.
+
+-   **Data type:** Spatial boundary data.
+
+-   **Use in this project:** This dataset is used to create a simple map of country-level food inflation.
+
+-   **Why it is suitable:** The World Bank data gives food inflation by country, but it is not spatial by itself. The Natural Earth boundary data makes it possible to join country-level inflation values to country shapes and display the results on a map.
+
+-   **Limitations:**
+
+-   **Privacy/Ethics:** This is public boundary data and does not contain personal information.
+
+### Data download and processing
+
+The raw datasets will be saved in `data/raw/`, and the processed datasets will be saved in `data/processed/`. I keep the raw and processed files separate so that the workflow is easier to check and reproduce.
+
+#### Downloading and processing Dataset 1
+
+I downloaded the FAO Food Price Index CSV file from the FAO website [CSV: Nominal indices from 1990 onwards (monthly)](https://www.fao.org/media/docs/worldfoodsituationlibraries/default-document-library/food_price_indices_data.csv?sfvrsn=523ebd2a_80&download=true) and saved it as:
+
+`data/raw_data/food_price_indices_data.csv`
+
+The raw FAO file has some title rows and extra empty columns, so it needs to be cleaned before analysis. I will keep the date column and the main food category columns.
+
+```{r}
+# Load packages
+library(tidyverse)
+library(lubridate)
+
+# Read the raw FAO Food Price Index data
+# The first two rows are skipped because the raw file has title information
+fpi_raw <- read_csv(
+  "data/raw_data/food_price_indices_data.csv",
+  skip = 2
+)
+
+# Keep only the columns needed for this analysis
+fpi_selected <- fpi_raw |>
+  select(
+    Date,
+    `Food Price Index`,
+    Meat,
+    Dairy,
+    Cereals,
+    Oils,
+    Sugar
+  )
+
+# Remove rows without a valid date
+# Convert the Date column from year-month text into a proper date format
+fpi_dated <- fpi_selected |>
+  filter(!is.na(Date)) |>
+  mutate(
+    Date = ym(Date)
+  ) 
+
+# Reshape the data from wide format to long format
+# This makes it easier to compare food categories in ggplot
+fpi_long <- fpi_dated |>
+  pivot_longer(
+    cols = c(`Food Price Index`, Meat, Dairy, Cereals, Oils, Sugar),
+    names_to = "category",
+    values_to = "price_index"
+  )
+
+# Keep data from 2020 onwards to match the research question
+fpi_clean <- fpi_long |>
+  filter(Date >= ymd("2020-01-01"))
+
+#Save cleaned data
+write_csv(
+  fpi_clean,
+  "data/processed_data/fao_food_price_indices_clean.csv"
+)
+```
+
+The cleaned FAO dataset will be saved as:
+
+`data/processed_data/fao_food_price_indices_clean.csv`
+
+This cleaned version will be used to make a line chart of food category trends and a bar chart showing which category increased the most after 2020.
+
+#### Downloading and processing Dataset 2
+
+I downloaded the World Bank country-level food inflation ZIP file from the World Bank Microdata Library , version 2026-05-1 , <https://microdata.worldbank.org/catalog/4509/download/358903>, and saved the extracted CSV file as:
+
+`data/raw_data/WLD_RTFP_country.csv`
+
+The raw World Bank file contains monthly food price inflation estimates by country. I manually downloaded the ZIP file, unzipped it, and placed the country-level CSV file in the raw_data folder. For this analysis, I will keep the country name, ISO3 country code, date and inflation columns.
+
+The cleaned World Bank dataset will be saved as:
+
+`data/processed_data/world_bank_food_inflation_clean.csv`
+
+This cleaned version will be used to compare food inflation patterns across countries from 2020 onwards.
+
+```{r}
+# Read raw World Bank country-level food inflation data
+food_country_raw <- read_csv("data/raw_data/WLD_RTFP_country.csv")
+
+# Clean data
+food_country_clean <- food_country_raw |>
+  mutate(
+    date = ymd(date)
+  ) |>
+  select(
+    country,
+    country_code = ISO3,
+    date,
+    food_inflation = Inflation
+  ) |>
+  filter(year(date) >= 2020) |>
+  filter(!is.na(food_inflation))
+
+#Save cleaned data
+write_csv(
+  food_country_clean,
+  "data/processed_data/world_bank_food_inflation_clean.csv"
+)
+```
+
+The cleaned World Bank dataset will be saved as:
+
+`data/processed/world_bank_food_inflation_clean.csv`
+
+This dataset will be used to compare selected countries over time. I may select a smaller group of countries for the line chart so that the graph is readable.
+
+#### Downloading and processing Dataset 3
+
+I will use Natural Earth country boundary data for the map. This can be loaded in R using the `rnaturalearth` and `sf` packages.
+
+<https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip>
+
+```{r}
+# Load packages
+library(tidyverse)
+library(sf)
+
+# Define the download link for the Natural Earth boundary data
+boundary_url <- "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip"
+
+# Define where the downloaded zip file will be saved
+boundary_zip <- "data/raw_data/ne_10m_admin_0_countries.zip"
+
+# Download the zip file from the URL and save it to the raw data folder
+download.file(
+  boundary_url,
+  boundary_zip,
+  mode = "wb"
+)
+
+# Create a folder for the extracted boundary files
+boundary_folder <- "data/raw_data/ne_10m_admin_0_countries"
+
+dir.create(boundary_folder, showWarnings = FALSE)
+
+# Unzip the Natural Earth boundary data
+unzip(
+  boundary_zip,
+  exdir = boundary_folder
+)
+
+# Read the country boundary shapefile
+boundary_path <- "data/raw_data/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp"
+
+world_boundary_raw <- read_sf(boundary_path)
+
+# Clean boundary data
+world_boundary_clean <- world_boundary_raw |>
+  select(
+    country = NAME,
+    country_code = ISO_A3,
+    geometry
+  )
+```
+
+<!-- Task 2 Tab: Writing your blogpost -->
+
+## Blog post
+
+### What's in this section
+
+Here is where you should write your blogpost! (Task 2)
+
+### Blogpost Structure
+
+There is no strict structure for you to follow. However, here is a skeleton structure you may find helpful.
+
+1.  Title (is set at the top of this document)
+2.  Motivation\
+3.  Data\
+4.  Analysis\
+5.  Conclusions\
+6.  References
+
+<!-- Task 3 Tab: Behind the Scenes -  -->
+
+## Behind the Scenes
+
+### What's in this section
+
+Here is where you should tell us about your reflection on your analysis (Task 3).
+
+Again, these are the details about **your** perspective and the gritty details behind the scenes of your analysis.
+:::
