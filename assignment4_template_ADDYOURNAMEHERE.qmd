@@ -47,23 +47,23 @@ For more details on the cleaned datasets and variables used in the analysis, I w
 
 #### Dataset 2: World Bank Monthly Food Price Inflation Estimates by Country
 
-\- Source: The World Bank\
-\
-- Link: <https://microdata.worldbank.org/catalog/4509/get-microdata>\
-\
-- Content: Modelled monthly food price estimates by product and market. \
-\
-- Time period used: 2020 onwards, to match the FAO analysis period.\
-\
-- Data type: Observational country-level and market-level time-series data.\
-\
-- Use in this project: This dataset is used to add country-level comparison to the analysis. While the FAO dataset shows global food category trends, the World Bank dataset provides more detailed food price estimates across countries, products and markets.\
-\
-- Why it is suitable: This dataset helps expand the project beyond a single global index. It allows me to compare food price patterns across countries and see whether food price pressure appears differently in different places.\
-\
-- Limitations: The data is based on modelled monthly food price estimates, so it may not represent the exact prices paid by every household. It is also more detailed than the FAO data and may require extra cleaning because it includes country, product and market information.\
-\
-- Privacy/Ethics: The data is public and does not contain personal information. Since it is country, product and market level data, there are no major privacy concerns.
+-   Source: The World Bank
+
+-   Link: <https://microdata.worldbank.org/catalog/4509/get-microdata>
+
+-   Content: Monthly food price inflation estimates by country. The dataset covers 40 countries and provides monthly inflation values from 2008 to 2026.
+
+-   Time period used: 2020 onwards, to match the FAO analysis period.
+
+-   Data type: Observational country-level time-series data.
+
+-   Use in this project: This dataset is used to add country-level comparison to the analysis. While the FAO dataset shows global food category trends, the World Bank dataset allows me to compare food inflation patterns across the countries covered by this dataset.
+
+-   Why it is suitable: This dataset helps expand the project beyond a single global food price index. It allows me to examine whether food inflation appears differently across countries, instead of only looking at the global FAO trend.
+
+-   Limitations: The dataset only covers 40 countries, so it does not provide complete global coverage. The countries included depend on where the World Bank has enough available food price information to estimate monthly food inflation. Therefore, the country-level results and map should be interpreted as a comparison of the covered countries, not as a complete world map of food inflation.
+
+-   Privacy/Ethics: The data is public and aggregated at the country level. It does not contain personal information, so there are no major privacy concerns.
 
 #### Dataset 3: Natural Earth Country Boundaries
 
@@ -85,7 +85,7 @@ For more details on the cleaned datasets and variables used in the analysis, I w
 
 ### Data download and processing
 
-The raw datasets will be saved in `data/raw/`, and the processed datasets will be saved in `data/processed/`. I keep the raw and processed files separate so that the workflow is easier to check and reproduce.
+The raw datasets will be saved in `data/raw_data/`, and the processed datasets will be saved in `data/processed_data/`. I keep the raw and processed files separate so that the workflow is easier to check and reproduce.
 
 #### Downloading and processing Dataset 1
 
@@ -194,15 +194,21 @@ write_csv(
 
 The cleaned World Bank dataset will be saved as:
 
-`data/processed/world_bank_food_inflation_clean.csv`
+`data/processed_data/world_bank_food_inflation_clean.csv`
 
 This dataset will be used to compare selected countries over time. I may select a smaller group of countries for the line chart so that the graph is readable.
 
 #### Downloading and processing Dataset 3
 
-I will use Natural Earth country boundary data for the map. This can be loaded in R using the `rnaturalearth` and `sf` packages.
+I downloaded the Natural Earth country boundary ZIP file from the direct download link:
 
 <https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip>
+
+The ZIP file was saved as:
+
+`data/raw_data/ne_10m_admin_0_countries.zip`
+
+After downloading, I unzipped the file and read the shapefile using `read_sf()`. For this analysis, I will keep the country name, ISO3 country code and geometry column.
 
 ```{r}
 # Load packages
@@ -246,6 +252,52 @@ world_boundary_clean <- world_boundary_raw |>
     geometry
   )
 ```
+
+```{r}
+# Summarise World Bank food inflation by country
+food_country_summary <- food_country_clean |>
+  group_by(country_code) |>
+  summarise(
+    avg_food_inflation = mean(food_inflation, na.rm = TRUE)
+  ) |>
+  ungroup()
+
+# Join food inflation data with country boundary data
+map_data <- world_boundary_clean |>
+  left_join(
+    food_country_summary,
+    by = "country_code"
+  ) 
+
+## Keep only countries with available World Bank food inflation data
+matched_map <- map_data |>
+  filter(!is.na(avg_food_inflation))
+
+# Save full joined map data
+write_sf(
+  map_data,
+  "data/processed_data/food_inflation_map_data_full.gpkg",
+  delete_dsn = TRUE
+)
+
+# Save matched map data with available food inflation values only
+write_sf(
+  matched_map,
+  "data/processed_data/food_inflation_map_data_matched.gpkg",
+  delete_dsn = TRUE
+)
+```
+
+### Additional Documentation
+
+\
+I have included an \`Additional_document/\` folder for markers to review. This folder contains the supporting documentation for the processed datasets.\
+\
+The folder includes:\
+\
+- \`README-32876793-A4.txt\`: explains the research question, data sources, raw and processed data files, processing steps, assumptions, limitations, and privacy/ethics considerations.\
+\
+- \`data_dictionary.csv\`: describes the key variables in the cleaned datasets, including variable names, descriptions, data types, storage formats, derivations, units, missing values, and notes.
 
 <!-- Task 2 Tab: Writing your blogpost -->
 
