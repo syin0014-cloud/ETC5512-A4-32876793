@@ -550,7 +550,7 @@ Data:
 
 *Afghanistan, Armenia, Bangladesh...and 37 more - Monthly food price inflation estimates by country*. (2021). Worldbank.org. <https://microdata.worldbank.org/catalog/4509/get-microdata>
 
-FAO. (2024). *FAO Food Price Index \| World Food Situation \| Food and Agriculture Organization of the United Nations*. Www.fao.org. <https://www.fao.org/worldfoodsituation/foodpricesindex/en/>
+FAO. (2024). *FAO Food Price Index | World Food Situation | Food and Agriculture Organization of the United Nations*. Www.fao.org. <https://www.fao.org/worldfoodsituation/foodpricesindex/en/>
 
 *Natural Earth» Blog Archive» Admin 0 – Countries - Free vector and raster map data at 1:10m, 1:50m, and 1:110m scales*. (n.d.). <https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/>
 
@@ -587,4 +587,18 @@ I did not use the AI output without checking it. I tested the code in R and comp
 Here is the [link](https://chatgpt.com/share/6a2be46b-b0b4-83ec-9803-1f07185d5ca3)
 
 ### Iterative process
+
+[The link of repository](https://github.com/syin0014-cloud/ETC5512-A4-32876793.git)
+
+commit history:
+
+i. bfcf79875b82a90669662c7b39eff894f25b959a
+
+ii. a831c21092f2d1fd4ac8fc326e66676f1cc2ff24
+
+iii. ecc1daf715e304b736992fc671a773c0e6382713
+
+iv. 5ee735d1ff90ea394c6f094055dc929252631847
+
+The commit message will show what changed between each version.
 :::
