@@ -1,9 +1,12 @@
 ---
-title: "What is your blogpost title? Add it here??"
+title: "Global Food Price Pressure After 2020"
 subtitle: "Assignment 4 ETC5512"
-author: "Who are you?? Add your name here"
+author: "Siyuan Yin 32876793"
 format: html
 editor: visual
+execute:
+  warning: false
+  message: false
 ---
 
 ::: panel-tabset
@@ -47,23 +50,23 @@ For more details on the cleaned datasets and variables used in the analysis, I w
 
 #### Dataset 2: World Bank Monthly Food Price Inflation Estimates by Country
 
--   Source: The World Bank
+-   **Source**: The World Bank
 
--   Link: <https://microdata.worldbank.org/catalog/4509/get-microdata>
+-   **Link**: <https://microdata.worldbank.org/catalog/4509/get-microdata>
 
--   Content: Monthly food price inflation estimates by country. The dataset covers 40 countries and provides monthly inflation values from 2008 to 2026.
+-   **Content**: Monthly food price inflation estimates by country. The dataset covers 40 countries and provides monthly inflation values from 2008 to 2026.
 
--   Time period used: 2020 onwards, to match the FAO analysis period.
+-   **Time period used**: 2020 onwards, to match the FAO analysis period.
 
--   Data type: Observational country-level time-series data.
+-   **Data type**: Observational country-level time-series data.
 
--   Use in this project: This dataset is used to add country-level comparison to the analysis. While the FAO dataset shows global food category trends, the World Bank dataset allows me to compare food inflation patterns across the countries covered by this dataset.
+-   **Use in this project**: This dataset is used to add country-level comparison to the analysis. While the FAO dataset shows global food category trends, the World Bank dataset allows me to compare food inflation patterns across the countries covered by this dataset.
 
--   Why it is suitable: This dataset helps expand the project beyond a single global food price index. It allows me to examine whether food inflation appears differently across countries, instead of only looking at the global FAO trend.
+-   **Why it is suitable**: This dataset helps expand the project beyond a single global food price index. It allows me to examine whether food inflation appears differently across countries, instead of only looking at the global FAO trend.
 
--   Limitations: The dataset only covers 40 countries, so it does not provide complete global coverage. The countries included depend on where the World Bank has enough available food price information to estimate monthly food inflation. Therefore, the country-level results and map should be interpreted as a comparison of the covered countries, not as a complete world map of food inflation.
+-   **Limitations**: The dataset only covers 40 countries, so it does not provide complete global coverage. The countries included depend on where the World Bank has enough available food price information to estimate monthly food inflation. Therefore, the country-level results and map should be interpreted as a comparison of the covered countries, not as a complete world map of food inflation.
 
--   Privacy/Ethics: The data is public and aggregated at the country level. It does not contain personal information, so there are no major privacy concerns.
+-   **Privacy/Ethics**: The data is public and aggregated at the country level. It does not contain personal information, so there are no major privacy concerns.
 
 #### Dataset 3: Natural Earth Country Boundaries
 
@@ -79,7 +82,7 @@ For more details on the cleaned datasets and variables used in the analysis, I w
 
 -   **Why it is suitable:** The World Bank data gives food inflation by country, but it is not spatial by itself. The Natural Earth boundary data makes it possible to join country-level inflation values to country shapes and display the results on a map.
 
--   **Limitations:**
+-   **Limitations:** Some Natural Earth boundary records do not have valid ISO3 country codes, and not all countries are covered by the World Bank food inflation dataset.
 
 -   **Privacy/Ethics:** This is public boundary data and does not contain personal information.
 
@@ -155,17 +158,11 @@ This cleaned version will be used to make a line chart of food category trends a
 
 #### Downloading and processing Dataset 2
 
-I downloaded the World Bank country-level food inflation ZIP file from the World Bank Microdata Library , version 2026-05-1 , <https://microdata.worldbank.org/catalog/4509/download/358903>, and saved the extracted CSV file as:
+I downloaded the World Bank country-level food inflation ZIP file from the World Bank Microdata Library, version 2026-05-18, <https://microdata.worldbank.org/catalog/4509/download/358903>, and saved the extracted CSV file as:
 
 `data/raw_data/WLD_RTFP_country.csv`
 
 The raw World Bank file contains monthly food price inflation estimates by country. I manually downloaded the ZIP file, unzipped it, and placed the country-level CSV file in the raw_data folder. For this analysis, I will keep the country name, ISO3 country code, date and inflation columns.
-
-The cleaned World Bank dataset will be saved as:
-
-`data/processed_data/world_bank_food_inflation_clean.csv`
-
-This cleaned version will be used to compare food inflation patterns across countries from 2020 onwards.
 
 ```{r}
 # Read raw World Bank country-level food inflation data
@@ -196,7 +193,7 @@ The cleaned World Bank dataset will be saved as:
 
 `data/processed_data/world_bank_food_inflation_clean.csv`
 
-This dataset will be used to compare selected countries over time. I may select a smaller group of countries for the line chart so that the graph is readable.
+This cleaned version will be used to compare food inflation patterns across countries from 2020 onwards.
 
 #### Downloading and processing Dataset 3
 
@@ -288,35 +285,252 @@ write_sf(
 )
 ```
 
+The cleaned and joined map datasets will be saved as:
+
+`data/processed_data/food_inflation_map_data_full.gpkg` `data/processed_data/food_inflation_map_data_matched.gpkg`
+
+The full version keeps all country boundary records after joining with the World Bank food inflation summary. The matched version only keeps countries with available food inflation values, and this version will be used for the map in the blog post.
+
 ### Additional Documentation
 
-\
-I have included an \`Additional_document/\` folder for markers to review. This folder contains the supporting documentation for the processed datasets.\
-\
-The folder includes:\
-\
-- \`README-32876793-A4.txt\`: explains the research question, data sources, raw and processed data files, processing steps, assumptions, limitations, and privacy/ethics considerations.\
-\
-- \`data_dictionary.csv\`: describes the key variables in the cleaned datasets, including variable names, descriptions, data types, storage formats, derivations, units, missing values, and notes.
+I have included an `Additional_document/` folder for markers to review. This folder contains the supporting documentation for the processed datasets.
+
+The folder includes:
+
+-   `README-32876793-A4.txt`: explains the research question, data sources, raw and processed data files, processing steps, assumptions, limitations, and privacy/ethics considerations.
+
+-   `data_dictionary.csv`: describes the key variables in the cleaned datasets, including variable names, descriptions, data types, storage formats, derivations, units, missing values, and notes.
 
 <!-- Task 2 Tab: Writing your blogpost -->
 
 ## Blog post
 
-### What's in this section
+### Food Price Trends After 2020: Which Categories Increased the Most and How Did Countries Differ?
 
-Here is where you should write your blogpost! (Task 2)
+### Motivation
 
-### Blogpost Structure
+Food prices are something people notice very quickly in daily life. Even if people do not follow inflation reports, they can still feel the difference when buying groceries, eating out, or cooking at home. This is why I chose food prices as my topic.
 
-There is no strict structure for you to follow. However, here is a skeleton structure you may find helpful.
+### Datasets for analyzing
 
-1.  Title (is set at the top of this document)
-2.  Motivation\
-3.  Data\
-4.  Analysis\
-5.  Conclusions\
-6.  References
+-   The first dataset I use is the FAO Food Price Index. After cleaning, the dataset has monthly observations from 2020 onwards. It includes the overall Food Price Index and five food categories: Meat, Dairy, Cereals, Oils and Sugar. I reshaped this data into long format so that each row contains one month, one category, and one index value.
+
+-   The second dataset is the World Bank Monthly Food Price Inflation Estimates by Country. This cleaned dataset contains monthly food inflation values for 40 countries from 2020 onwards. I use it to compare country-level food inflation patterns.
+
+-   The third dataset is Natural Earth country boundary data. This dataset is used only for the map. I joined the country-level food inflation summary with the boundary data using ISO3 country codes.
+
+-   There are some limitations. The FAO data is a global index, so it does not show household-level grocery prices. The World Bank dataset only covers 40 countries, so the map is not a complete global food inflation map. It should be interpreted as a comparison of countries covered by that dataset.
+
+### Analysis
+
+-   First, I looked at the overall trend in the FAO Food Price Index and the main food categories. @fig-fao-trend shows that food prices did not move evenly across all categories after 2020.
+
+    ```{r}
+    #| label: fig-fao-trend
+    #| fig-cap: "FAO food price index by category from 2020 onwards"
+    #| echo: false
+    #| warning: false
+    #| message: false
+
+    ggplot(fpi_clean, aes(x = Date, y = price_index, colour = category)) +
+      geom_line() +
+      labs(
+        x = "Date",
+        y = "Price index",
+        colour = "Category"
+      ) +
+      theme_minimal()
+    ```
+
+    The line chart in @fig-fao-trend shows that the overall Food Price Index increased from 102.5 in January 2020 to 130.8 in May 2026. This is an increase of about 27.6%.
+
+    However, Oils increased much more strongly than the overall index. The Oils index increased from 108.73 in January 2020 to 185.0 in May 2026, which is about a 70.1% increase.
+
+    Meat also increased, from 103.5 to 130.5, or about 26.1%. Dairy and Cereals increased more moderately, while Sugar had the smallest increase over the full period. The overall index gives a useful summary, but it hides the fact that Oils changed much more sharply than categories such as Sugar, Dairy and Cereals.
+
+-   I also looked at the highest index value reached by each food category. This helps show whether some categories had a temporary price shock during the period.
+
+    ```{r}
+    #| label: fig-fao-peak
+    #| fig-cap: "Peak FAO food category price index from 2020 onwards"
+    #| echo: false
+    #| warning: false
+    #| message: false
+
+    # Keep only the five specific food categories
+    # The overall Food Price Index is removed because it is a summary index, not a food category
+    fao_peak <- fpi_clean |>
+      filter(category != "Food Price Index") |>
+      
+      # Group the data by food category
+      group_by(category) |>
+      
+      # Find the highest index value and the month when it happened
+      summarise(
+        peak_index = max(price_index, na.rm = TRUE),
+        peak_date = Date[which.max(price_index)],
+        .groups = "drop"
+      ) |>
+      
+      # Add the peak month to the label so the chart shows both value and timing
+      mutate(
+        peak_label = paste0(category, " (", format(peak_date, "%Y-%m"), ")")
+      )
+
+    # Plot the peak index value for each food category
+    ggplot(fao_peak, aes(x = reorder(peak_label, peak_index), y = peak_index)) +
+      geom_col() +
+      coord_flip() +
+      labs(
+        x = "Food category and peak month",
+        y = "Peak price index"
+      ) +
+      theme_minimal()
+    ```
+
+    @fig-fao-peak focuses only on the five specific food categories. Most categories reached their peak between 2022 and 2023. Oils had the highest peak, reaching 251.8 in March 2022. Cereals and Dairy also peaked in 2022, while Sugar peaked later in September 2023.
+
+    This suggests that the strongest food price pressure was concentrated in the middle of the period, especially around 2022, rather than increasing smoothly every year. Meat is different from the other categories because its peak appears in May 2026.
+
+-   Next, maps show where higher average food inflation appeared across the matched countries. Grey areas are countries without matched World Bank food inflation values.
+
+    ```{r}
+    #| label: fig-food-inflation-map-overall
+    #| fig-cap: "Average food inflation in countries covered by the World Bank dataset"
+    #| echo: false
+    #| warning: false
+    #| message: false
+    #| fig-width: 10
+    #| fig-height: 6
+
+    # Overall map:
+    # First layer shows all country boundaries in the Natural Earth data
+    # Second layer colours only countries with available World Bank food inflation data
+    ggplot() +
+      geom_sf(
+        data = map_data,
+        fill = "grey90",
+        colour = "white",
+        linewidth = 0.1
+      ) +
+      geom_sf(
+        data = matched_map,
+        aes(fill = avg_food_inflation),
+        colour = "white",
+        linewidth = 0.15
+      ) +
+      scale_fill_gradient(
+        low = "#FFF7BC",
+        high = "#D95F0E",
+        name = "Average food inflation"
+      ) +
+      labs(
+        x = NULL,
+        y = NULL
+      ) +
+      theme_minimal()
+    ```
+
+    ```{r}
+    #| label: fig-map-africa-middle-east
+    #| fig-cap: "Average food inflation in Africa and the Middle East for matched countries"
+    #| echo: false
+    #| warning: false
+    #| message: false
+    #| fig-width: 9
+    #| fig-height: 6
+
+    # Regional zoom map:
+    # First layer shows the full Natural Earth boundary data in grey
+    # Second layer colours only countries matched with World Bank food inflation data
+    ggplot() +
+      geom_sf(
+        data = map_data,
+        fill = "grey90",
+        colour = "white",
+        linewidth = 0.1
+      ) +
+      geom_sf(
+        data = matched_map,
+        aes(fill = avg_food_inflation),
+        colour = "white",
+        linewidth = 0.15
+      ) +
+      coord_sf(
+        xlim = c(-25, 65),
+        ylim = c(-35, 40),
+        expand = FALSE
+      ) +
+      scale_fill_gradient(
+        low = "#FFF7BC",
+        high = "#D95F0E",
+        name = "Average food inflation"
+      ) +
+      labs(
+        x = NULL,
+        y = NULL
+      ) +
+      theme_minimal()
+    ```
+
+    ```{r}
+    #| label: fig-map-asia
+    #| fig-cap: "Average food inflation in Asia and Southeast Asia for matched countries"
+    #| echo: false
+    #| warning: false
+    #| message: false
+    #| fig-width: 9
+    #| fig-height: 6
+
+    # Regional zoom map for Asia and Southeast Asia
+    # Grey areas are boundary records without matched World Bank food inflation values
+    ggplot() +
+      geom_sf(
+        data = map_data,
+        fill = "grey90",
+        colour = "white",
+        linewidth = 0.1
+      ) +
+      geom_sf(
+        data = matched_map,
+        aes(fill = avg_food_inflation),
+        colour = "white",
+        linewidth = 0.15
+      ) +
+      coord_sf(
+        xlim = c(55, 150),
+        ylim = c(-15, 45),
+        expand = FALSE
+      ) +
+      scale_fill_gradient(
+        low = "#FFF7BC",
+        high = "#D95F0E",
+        name = "Average food inflation"
+      ) +
+      labs(
+        x = NULL,
+        y = NULL
+      ) +
+      theme_minimal()
+    ```
+
+    @fig-food-inflation-map-overall gives the full view of the matched country-level food inflation data. The grey countries are included in the Natural Earth boundary data, but they do not have matched World Bank food inflation values in this project. Therefore, grey does not mean zero food inflation. It only means those countries are outside the World Bank dataset coverage used here.
+
+    @fig-map-africa-middle-east makes the pattern much clearer for Africa and the Middle East. In this zoomed map, Sudan stands out with a much darker orange colour than nearby countries, which means it has a higher average food inflation value. Lebanon also appears as a high-inflation country in the Middle East. Other countries in this region are lighter yellow or light orange, so their average food inflation is lower than Sudan and Lebanon. This shows that even inside the same broad region, food inflation was not experienced at the same level.
+
+    @fig-map-asia shows Asia and Southeast Asia. Compared with the Africa and Middle East map, most matched countries in this region are lighter yellow or light orange. This suggests lower average food inflation values among the Asian countries covered in the dataset.
+
+### Conclusion
+
+Overall, the analysis shows that food price pressure after 2020 was uneven.\
+\
+- For food categories, Oils changed the most sharply. It increased much more than the overall Food Price Index and reached the highest peak in March 2022.\
+\
+- Most category-level peaks happened around 2022 to 2023. This shows that food price pressure was not a smooth increase every year. It had a stronger shock period in the middle of the timeline.\
+\
+- At the country level, food inflation was much higher in some matched countries. Sudan and Lebanon stand out clearly in the regional map, especially compared with many lighter-coloured countries in Asia and Southeast Asia.\
+\
+- The grey areas in the maps are important. They are countries without matched World Bank food inflation values, not countries with zero food inflation. Therefore, the maps are useful for comparing covered countries, but they should not be read as a complete global food inflation map.
 
 <!-- Task 3 Tab: Behind the Scenes -  -->
 
